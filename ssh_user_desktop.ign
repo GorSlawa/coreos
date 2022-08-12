@@ -1,0 +1,74 @@
+{
+  "ignition": {
+    "version": "3.3.0"
+  },
+  "passwd": {
+    "users": [
+      {
+        "name": "core",
+        "passwordHash": "$y$j9T$VhLvIl5tOyGbuw5OIJcTC/$2j3JL9BeSdKYUosHsUNBWqDfqE8Bruci/JL36uwOhA2",
+        "sshAuthorizedKeys": [
+          "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDFF7GUxOYQh4MH4WbqTdTqnbNQxxMeZas6GCep1wgo9TGINngR5MOda+zHm0GRYv857WN07zMEqPIY3ncCaXNxNAfO+7peuc9rJGQYB0esXmXwKlKLzc49F5SD73cj0YvISY/DvxqUHhY36KcAl3tLZByQ4eEnv9CPg3Fe+AAz54xv4XhY7cAuTIRxaIYfHnol/wKTGK6vk5PT3MPY3kg2+PURHTy0rSFTcJ73lBvsCjAPoOVl492GqLOS2OhNClaa4fCpPpNBoJZfG1XWDdvLXUG536a8+UBoS4LBKPWaeSG6wp3i3eaIScHCO4qdCg7R1fbikhqTVwx25wVfGqSZeXz+R7w8VPf6jjHn9qzsAzqNWgeZwWxZvmPiYgjf5lkXq27FPIFX5zva25YeosMZpap4DlET/zSWWPWXxwEVtt/MfGyxB75KxlqPjs47LNXNtjOaGWFS9PSCvGJXjE9cRF4Bz0zZs9+4tyhmSIij1s9eGTDkESD9VDWpj6BKqRc= toolbox@toolbox"
+        ]
+      }
+    ]
+  },
+  "storage": {
+    "files": [
+      {
+        "path": "/etc/systemd/system/rpm-ostree-install.service.d/rpms.conf",
+        "contents": {
+          "compression": "gzip",
+          "source": "data:;base64,H4sIAAAAAAAC/1SOsW7rMAxFd3+FkF1D8JbXIWPHAkUz1h1YiVEIWaRBUq7bry8KNI47ngNe3vt6Rl0o4dvwyAupcEP208vz0/l0GIdVtMT1eIxZl8jSF4QeSm6hsDSMdsVpCuPA0J2mbr/aURsxTLerT3NssQmTi4ZxWHOJ3VBjJrVYvIYLZlGIH6LVHJyE4zukWlQ6ZwvjkCTVmTyai0LBHG6C0X9SDRgK6qZnSBUKVvJNibki7n41SFditHtIcgPe0HAi7uvGNfc2b5RQnS6UwPHPQDHFWfTem6TNYrtt//4/xGy7GjbRO39d7DB8BwAA//8QnQzblwEAAA=="
+        },
+        "mode": 420
+      },
+      {
+        "path": "/etc/hostname",
+        "contents": {
+          "compression": "",
+          "source": "data:,testing%0A"
+        },
+        "mode": 420
+      },
+      {
+        "path": "/etc/profile.d/systemd-pager.sh",
+        "contents": {
+          "compression": "",
+          "source": "data:,%23%20Tell%20systemd%20to%20not%20use%20a%20pager%20when%20printing%20information%0Aexport%20SYSTEMD_PAGER%3Dcat%0A"
+        },
+        "mode": 420
+      },
+      {
+        "path": "/etc/sysctl.d/20-silence-audit.conf",
+        "contents": {
+          "compression": "",
+          "source": "data:,%23%20Raise%20console%20message%20logging%20level%20from%20DEBUG%20(7)%20to%20WARNING%20(4)%0A%23%20to%20hide%20audit%20messages%20from%20the%20interactive%20console%0Akernel.printk%3D4%0A"
+        },
+        "mode": 420
+      }
+    ]
+  },
+  "systemd": {
+    "units": [
+      {
+        "contents": "[Unit]\nDescription=Layer additional rpms\nWants=network-online.target\nAfter=network-online.target\n# We run before `zincati.service` to avoid conflicting rpm-ostree transactions.\nBefore=zincati.service\nConditionPathExists=!/var/lib/%N.stamp\n[Service]\nType=oneshot\nRemainAfterExit=yes\nExecStart=/usr/bin/rpm-ostree install --apply-live --allow-inactive $RPMS\nExecStart=/bin/touch /var/lib/%N.stamp\n[Install]\nWantedBy=multi-user.target\n",
+        "enabled": true,
+        "name": "rpm-ostree-install.service"
+      },
+      {
+        "dropins": [
+          {
+            "contents": "[Service]\n# Override Execstart in main unit\nExecStart=\n# Add new Execstart with `-` prefix to ignore failure\nExecStart=-/usr/sbin/agetty --autologin core --noclear %I $TERM\nTTYVTDisallocate=no\n",
+            "name": "autologin-core.conf"
+          }
+        ],
+        "name": "serial-getty@ttyS0.service"
+      },
+      {
+        "enabled": true,
+        "name": "gdm.service"
+      }
+    ]
+  }
+}
