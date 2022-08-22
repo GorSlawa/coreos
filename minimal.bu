@@ -2,11 +2,7 @@ variant: fcos
 version: 1.4.0
 passwd:
   users:
-    - name: slawa
-      groups:
-        - wheel
-        - sudo
-      password_hash: $y$j9T$R23cCg85ZDv57qRLhBx6v1$lSChuoz8dH8KwmB1ufbreIj8RjeZ8fwpObOQGke0.p7
+    - name: core 
       ssh_authorized_keys:
         - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDFF7GUxOYQh4MH4WbqTdTqnbNQxxMeZas6GCep1wgo9TGINngR5MOda+zHm0GRYv857WN07zMEqPIY3ncCaXNxNAfO+7peuc9rJGQYB0esXmXwKlKLzc49F5SD73cj0YvISY/DvxqUHhY36KcAl3tLZByQ4eEnv9CPg3Fe+AAz54xv4XhY7cAuTIRxaIYfHnol/wKTGK6vk5PT3MPY3kg2+PURHTy0rSFTcJ73lBvsCjAPoOVl492GqLOS2OhNClaa4fCpPpNBoJZfG1XWDdvLXUG536a8+UBoS4LBKPWaeSG6wp3i3eaIScHCO4qdCg7R1fbikhqTVwx25wVfGqSZeXz+R7w8VPf6jjHn9qzsAzqNWgeZwWxZvmPiYgjf5lkXq27FPIFX5zva25YeosMZpap4DlET/zSWWPWXxwEVtt/MfGyxB75KxlqPjs47LNXNtjOaGWFS9PSCvGJXjE9cRF4Bz0zZs9+4tyhmSIij1s9eGTDkESD9VDWpj6BKqRc= toolbox@toolbox
 
@@ -18,3 +14,32 @@ storage:
       mode: 0644
       contents:
         inline: broker
+    - path: /etc/systemd/system/rpm-ostree-install.service.d/rpms.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Service]
+          Environment=RPMS="cockpit-networkmanager cockpit-ostree cockpit-podman cockpit-system \
+             rpmfusion-free-release-36-1.noarch rpmfusion-nonfree-release-36-1.noarch"
+
+systemd:
+  units:
+    - name: rpm-ostree-install.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Layer additional rpms
+        Wants=network-online.target
+        After=network-online.target
+        # We run before `zincati.service` to avoid conflicting rpm-ostree transactions.
+        Before=zincati.service
+        ConditionPathExists=!/var/lib/%N.stamp
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=/usr/bin/rpm-ostree install --apply-live --allow-inactive $RPMS
+        ExecStart=/bin/touch /var/lib/%N.stamp
+        [Install]
+        WantedBy=multi-user.target
+
+
