@@ -31,8 +31,7 @@ systemd:
         Type=oneshot
         RemainAfterExit=yes
         ExecStart=/usr/bin/rpm-ostree install --apply-live --allow-inactive \
-        cockpit-networkmanager cockpit-ostree cockpit-podman cockpit-system \
-        rpmfusion-free-release-36-1.noarch rpmfusion-nonfree-release-36-1.noarch 
+        cockpit-networkmanager cockpit-ostree cockpit-podman cockpit-system  
         ExecStart=/bin/touch /var/lib/%N.stamp
         [Install]
         WantedBy=multi-user.target

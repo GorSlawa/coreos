@@ -27,7 +27,7 @@
   "systemd": {
     "units": [
       {
-        "contents": "[Unit]\nDescription=Layer additional rpms\nWants=network-online.target\nAfter=network-online.target\n# We run before `zincati.service` to avoid conflicting rpm-ostree transactions.\nBefore=zincati.service\nConditionPathExists=!/var/lib/%N.stamp\n[Service]\nType=oneshot\nRemainAfterExit=yes\nExecStart=/usr/bin/rpm-ostree install --apply-live --allow-inactive \\\ncockpit-networkmanager cockpit-ostree cockpit-podman cockpit-system \\\nrpmfusion-free-release-36-1.noarch rpmfusion-nonfree-release-36-1.noarch \nExecStart=/bin/touch /var/lib/%N.stamp\n[Install]\nWantedBy=multi-user.target\n",
+        "contents": "[Unit]\nDescription=Layer additional rpms\nWants=network-online.target\nAfter=network-online.target\n# We run before `zincati.service` to avoid conflicting rpm-ostree transactions.\nBefore=zincati.service\nConditionPathExists=!/var/lib/%N.stamp\n[Service]\nType=oneshot\nRemainAfterExit=yes\nExecStart=/usr/bin/rpm-ostree install --apply-live --allow-inactive \\\ncockpit-networkmanager cockpit-ostree cockpit-podman cockpit-system  \nExecStart=/bin/touch /var/lib/%N.stamp\n[Install]\nWantedBy=multi-user.target\n",
         "enabled": true,
         "name": "rpm-ostree-install.service"
       }
