@@ -6,7 +6,6 @@
     "users": [
       {
         "groups": [
-          "docker",
           "wheel",
           "sudo"
         ],
