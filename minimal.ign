@@ -5,11 +5,7 @@
   "passwd": {
     "users": [
       {
-        "groups": [
-          "wheel",
-          "sudo"
-        ],
-        "name": "slawa",
+        "name": "core",
         "sshAuthorizedKeys": [
           "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDFF7GUxOYQh4MH4WbqTdTqnbNQxxMeZas6GCep1wgo9TGINngR5MOda+zHm0GRYv857WN07zMEqPIY3ncCaXNxNAfO+7peuc9rJGQYB0esXmXwKlKLzc49F5SD73cj0YvISY/DvxqUHhY36KcAl3tLZByQ4eEnv9CPg3Fe+AAz54xv4XhY7cAuTIRxaIYfHnol/wKTGK6vk5PT3MPY3kg2+PURHTy0rSFTcJ73lBvsCjAPoOVl492GqLOS2OhNClaa4fCpPpNBoJZfG1XWDdvLXUG536a8+UBoS4LBKPWaeSG6wp3i3eaIScHCO4qdCg7R1fbikhqTVwx25wVfGqSZeXz+R7w8VPf6jjHn9qzsAzqNWgeZwWxZvmPiYgjf5lkXq27FPIFX5zva25YeosMZpap4DlET/zSWWPWXxwEVtt/MfGyxB75KxlqPjs47LNXNtjOaGWFS9PSCvGJXjE9cRF4Bz0zZs9+4tyhmSIij1s9eGTDkESD9VDWpj6BKqRc= toolbox@toolbox"
         ]
@@ -25,6 +21,23 @@
           "source": "data:,broker"
         },
         "mode": 420
+      },
+      {
+        "path": "/etc/systemd/system/rpm-ostree-install.service.d/rpms.conf",
+        "contents": {
+          "compression": "gzip",
+          "source": "data:;base64,H4sIAAAAAAAC/3TKsQrCMBSF4T1PEbpHEMGto6MgdlSHEE811Jwbbq4V397J4uL4/3ynATrnhIvbcc4qLKD1x8N+6LskaarZAmEv0alExhvUf7c0U2DJKtcSuWR7N0PxZ+e911rGZ8vCMCoQFA/EhrDZhvWKEjXdfwiF/1TnPgEAAP//5rGGcq8AAAA="
+        },
+        "mode": 420
+      }
+    ]
+  },
+  "systemd": {
+    "units": [
+      {
+        "contents": "[Unit]\nDescription=Layer additional rpms\nWants=network-online.target\nAfter=network-online.target\n# We run before `zincati.service` to avoid conflicting rpm-ostree transactions.\nBefore=zincati.service\nConditionPathExists=!/var/lib/%N.stamp\n[Service]\nType=oneshot\nRemainAfterExit=yes\nExecStart=/usr/bin/rpm-ostree install --apply-live --allow-inactive $RPMS\nExecStart=/bin/touch /var/lib/%N.stamp\n[Install]\nWantedBy=multi-user.target\n",
+        "enabled": true,
+        "name": "rpm-ostree-install.service"
       }
     ]
   }
