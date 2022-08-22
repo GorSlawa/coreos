@@ -5,6 +5,11 @@
   "passwd": {
     "users": [
       {
+        "groups": [
+          "docker",
+          "wheel",
+          "sudo"
+        ],
         "name": "slawa",
         "passwordHash": "$y$j9T$R23cCg85ZDv57qRLhBx6v1$lSChuoz8dH8KwmB1ufbreIj8RjeZ8fwpObOQGke0.p7",
         "sshAuthorizedKeys": [
