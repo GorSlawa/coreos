@@ -14,13 +14,6 @@ storage:
       mode: 0644
       contents:
         inline: broker
-    - path: /etc/systemd/system/rpm-ostree-install.service.d/rpms.conf
-      mode: 0644
-      contents:
-        inline: |
-          [Service]
-          Environment=RPMS="cockpit-networkmanager cockpit-ostree cockpit-podman cockpit-system \
-             rpmfusion-free-release-36-1.noarch rpmfusion-nonfree-release-36-1.noarch"
 
 systemd:
   units:
@@ -37,7 +30,9 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=/usr/bin/rpm-ostree install --apply-live --allow-inactive $RPMS 
+        ExecStart=/usr/bin/rpm-ostree install --apply-live --allow-inactive \
+        cockpit-networkmanager cockpit-ostree cockpit-podman cockpit-system \
+        rpmfusion-free-release-36-1.noarch rpmfusion-nonfree-release-36-1.noarch 
         ExecStart=/bin/touch /var/lib/%N.stamp
         [Install]
         WantedBy=multi-user.target

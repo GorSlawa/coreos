@@ -21,21 +21,13 @@
           "source": "data:,broker"
         },
         "mode": 420
-      },
-      {
-        "path": "/etc/systemd/system/rpm-ostree-install.service.d/rpms.conf",
-        "contents": {
-          "compression": "gzip",
-          "source": "data:;base64,H4sIAAAAAAAC/3TKsQrCMBSF4T1PEbpHEMGto6MgdlSHEE811Jwbbq4V397J4uL4/3ynATrnhIvbcc4qLKD1x8N+6LskaarZAmEv0alExhvUf7c0U2DJKtcSuWR7N0PxZ+e911rGZ8vCMCoQFA/EhrDZhvWKEjXdfwiF/1TnPgEAAP//5rGGcq8AAAA="
-        },
-        "mode": 420
       }
     ]
   },
   "systemd": {
     "units": [
       {
-        "contents": "[Unit]\nDescription=Layer additional rpms\nWants=network-online.target\nAfter=network-online.target\n# We run before `zincati.service` to avoid conflicting rpm-ostree transactions.\nBefore=zincati.service\nConditionPathExists=!/var/lib/%N.stamp\n[Service]\nType=oneshot\nRemainAfterExit=yes\nExecStart=/usr/bin/rpm-ostree install --apply-live --allow-inactive $RPMS \nExecStart=/bin/touch /var/lib/%N.stamp\n[Install]\nWantedBy=multi-user.target\n",
+        "contents": "[Unit]\nDescription=Layer additional rpms\nWants=network-online.target\nAfter=network-online.target\n# We run before `zincati.service` to avoid conflicting rpm-ostree transactions.\nBefore=zincati.service\nConditionPathExists=!/var/lib/%N.stamp\n[Service]\nType=oneshot\nRemainAfterExit=yes\nExecStart=/usr/bin/rpm-ostree install --apply-live --allow-inactive \\\ncockpit-networkmanager cockpit-ostree cockpit-podman cockpit-system \\\nrpmfusion-free-release-36-1.noarch rpmfusion-nonfree-release-36-1.noarch \nExecStart=/bin/touch /var/lib/%N.stamp\n[Install]\nWantedBy=multi-user.target\n",
         "enabled": true,
         "name": "rpm-ostree-install.service"
       }
